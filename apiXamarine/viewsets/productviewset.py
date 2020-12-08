@@ -1,5 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from apiXamarine.models import Product
@@ -9,6 +10,7 @@ from apiXamarine.serializers import ProductSerializer
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]
 
     # Action decorator is used to mark a function as routable: details is used to say if the method has to handle
     # more than 1 item of the referred class.
