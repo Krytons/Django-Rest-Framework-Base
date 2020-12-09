@@ -6,7 +6,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'barcode', 'description', 'created_at']
-        read_only_fields = ['id', 'created_id']
+        read_only_fields = ['id', 'created_at']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -37,3 +37,29 @@ class RegistrationSerializer(serializers.ModelSerializer):
         app_user.set_password(password)
         app_user.save()
         return app_user
+
+class ObservedProductSerializer(serializers.ModelSerializer):
+    creator = serializers.SlugRelatedField(
+        many=False,
+        read_only=False,
+        slug_field='email',
+        queryset = AppUser.objects.all()
+    )
+
+    product = serializers.PrimaryKeyRelatedField(
+        many=False,
+        read_only=False,
+        queryset=Product.objects.all()
+    )
+
+    class Meta:
+        model = ObservedProduct
+        fields = ['creator', 'product', 'threshold_price']
+        read_only_fields = ['id']
+
+    def get_unique_together_validators(self):
+        """Overriding method to disable unique together checks"""
+        return []
+
+
+

@@ -7,6 +7,8 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
+# Imports used to use mongoDB collections
+from djongo import models
 
 # Create your models here.
 class Product(models.Model):
@@ -76,3 +78,13 @@ class AppUser(AbstractBaseUser, PermissionsMixin):
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created: # Each time a user is created, a token will be generated
         Token.objects.create(user=instance)
+
+
+class ObservedProduct(models.Model):
+    creator = models.ForeignKey(AppUser, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    threshold_price = models.FloatField()
+
+    class Meta:
+        unique_together = ['creator', 'product']
+
