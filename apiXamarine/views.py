@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.shortcuts import render
 
@@ -6,8 +7,9 @@ from djongo.database import DatabaseError
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 
+from apiXamarine.models import ObservedProduct
 from apiXamarine.serializers import RegistrationSerializer, ObservedProductSerializer
 from rest_framework.authtoken.models import Token
 
@@ -36,7 +38,7 @@ def register_user(request):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def create_observation(request):
     serializer = ObservedProductSerializer(data=request.data)
     if serializer.is_valid():
@@ -51,4 +53,14 @@ def create_observation(request):
                 return Response({'response': 'This element is already observed'}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def get_all_observation(request):
+    try:
+        observations = ObservedProduct.objects.all()
+        serializer = ObservedProductSerializer(observations, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response({'response': 'There are no observations at the moment'}, status=status.HTTP_400_BAD_REQUEST)
 

@@ -6,5 +6,6 @@ urlpatterns = [
     path('', home, name='home'),
     path('register', register_user, name='register'),
     path('login', obtain_auth_token, name='login'),
-    path('create_observation', create_observation, name='create_observation')
+    path('create_observation', create_observation, name='create_observation'),
+    path('get_all_observation', get_all_observation, name='get_all_observation')
 ]
